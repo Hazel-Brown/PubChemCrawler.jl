@@ -76,6 +76,71 @@ function query_substructure(;cid=nothing, smiles=nothing, smarts=nothing,       
     return r.body
 end
 
+function query_superstructure(;cid=nothing, smiles=nothing, smarts=nothing,          # inputs
+                               properties="MolecularFormula,MolecularWeight,XLogP,", # http://pubchemdocs.ncbi.nlm.nih.gov/pug-rest, "Compound Property Tables"
+                               output="CSV",
+                               kwargs...)
+    input = "compound/fastsuperstructure/"
+    if cid !== nothing
+        (smiles === nothing && smarts === nothing) || throw(ArgumentError("only one of cid, smiles, or smarts can be specified"))
+        input *= "cid/$cid/"
+    elseif smiles !== nothing
+        smarts === nothing || throw(ArgumentError("only one of cid, smiles, or smarts can be specified"))
+        input *= "smiles/$smiles/"
+    elseif smarts !== nothing
+        input *= "smarts/$smarts/"
+    else
+        throw(ArgumentError("one of cid, smiles, or smarts must be specified"))
+    end
+    props = canonicalize_properties("property/" * properties)
+    url = prolog * input * props * output * "?StripHydrogen=true"
+    r = HTTP.request("GET", url; kwargs...)
+    return r.body
+end
+
+function query_similarity_2d(;cid=nothing, smiles=nothing, smarts=nothing,          # inputs
+                              properties="MolecularFormula,MolecularWeight,XLogP,", # http://pubchemdocs.ncbi.nlm.nih.gov/pug-rest, "Compound Property Tables"
+                              output="CSV",
+                              kwargs...)
+    input = "compound/fastsimilarity_2d/"
+    if cid !== nothing
+        (smiles === nothing && smarts === nothing) || throw(ArgumentError("only one of cid, smiles, or smarts can be specified"))
+        input *= "cid/$cid/"
+    elseif smiles !== nothing
+        smarts === nothing || throw(ArgumentError("only one of cid, smiles, or smarts can be specified"))
+        input *= "smiles/$smiles/"
+    elseif smarts !== nothing
+        input *= "smarts/$smarts/"
+    else
+        throw(ArgumentError("one of cid, smiles, or smarts must be specified"))
+    end
+    props = canonicalize_properties("property/" * properties)
+    url = prolog * input * props * output * "?StripHydrogen=true"
+    r = HTTP.request("GET", url; kwargs...)
+    return r.body
+end
+
+function query_similarity_3d(;cid=nothing, smiles=nothing, smarts=nothing,          # inputs
+                              properties="MolecularFormula,MolecularWeight,XLogP,", # http://pubchemdocs.ncbi.nlm.nih.gov/pug-rest, "Compound Property Tables"
+                              output="CSV",
+                              kwargs...)
+    input = "compound/fastsimilarity_3d/"
+    if cid !== nothing
+        (smiles === nothing && smarts === nothing) || throw(ArgumentError("only one of cid, smiles, or smarts can be specified"))
+        input *= "cid/$cid/"
+    elseif smiles !== nothing
+        smarts === nothing || throw(ArgumentError("only one of cid, smiles, or smarts can be specified"))
+        input *= "smiles/$smiles/"
+    elseif smarts !== nothing
+        input *= "smarts/$smarts/"
+    else
+        throw(ArgumentError("one of cid, smiles, or smarts must be specified"))
+    end
+    props = canonicalize_properties("property/" * properties)
+    url = prolog * input * props * output * "?StripHydrogen=true"
+    r = HTTP.request("GET", url; kwargs...)
+    return r.body
+end
 """
     msg = get_for_cids(cids; properties|xrefs|cids_type|record_type, output="CSV")
 
