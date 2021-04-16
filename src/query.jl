@@ -3,14 +3,24 @@ const prolog = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/"
 """
     cid = get_cid(name="glucose")
     cid = get_cid(smiles="C([C@@H]1[C@H]([C@@H]([C@H](C(O1)O)O)O)O)O")
+    cid = get_cid(inchikey="WQZGKKKJIJFFOK-GASJEMHNSA-N")
 
 Return the PubChem **c**ompound **id**entification number for the specified compound.
 """
-function get_cid(; name=nothing, smiles=nothing,                   # inputs
+function get_cid(; name=nothing, smiles=nothing, inchikey=nothing,         # inputs
                    kwargs...)
     input = "compound/"
-    name !== nothing && (input *= "name/$(HTTP.escapeuri(name))/")
-    smiles !== nothing && (input *= "smiles/$((smiles))/")
+    if name !== nothing
+        (smiles === nothing && inchikey === nothing) || throw(ArgumentError("only one of cid, smiles, or smarts can be specified"))
+        input *= "name/$(HTTP.escapeuri(name))/"
+    elseif smiles !== nothing
+        inchikey === nothing || throw(ArgumentError("only one of cid, smiles, or smarts can be specified"))
+        input *= "smiles/$smiles/"
+    elseif inchikey !== nothing
+        input *= "inchikey/$inchikey/"
+    else
+        throw(ArgumentError("one of name, smiles, or inchikey must be specified"))
+    end
     url = prolog * input * "cids/TXT"
     r = HTTP.request("GET", url; kwargs...)
     return parse(Int, chomp(String(r.body)))
