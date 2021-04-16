@@ -217,7 +217,7 @@ julia> dct[:InformationList][:Information]
 }
 ```
 """
-function get_for_cids(cids;
+function get_for_cids(cids...;
                       properties=nothing,
                       xrefs=nothing,
                       cids_type=nothing,
@@ -246,4 +246,4 @@ function get_for_cids(cids;
     return r.body
 end
 
-get_for_cids(cid::Int; kwargs...) = get_for_cids([cid]; kwargs...)
+get_for_cids(cids::Union{Tuple,AbstractArray}; kwargs...) = get_for_cids(cids...; kwargs...)
